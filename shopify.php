@@ -10,18 +10,20 @@
 	}
 
 
-	function is_valid_request($query_params, $shared_secret)
+  function is_valid_request($query_params, $shared_secret)
 	{
-		if(!is_array($query_params))
-			return false;
-		if(array_key_exists('shop',$query_params) && array_key_exists('timestamp',$query_params) && array_key_exists('hmac',$query_params)) {
-			$hmac = $query_params['hmac'];
-			unset($query_params['signature']);
-			unset($query_params['hmac']);
-			ksort($query_params);
-			return $hmac == hash_hmac('sha256', http_build_query($query_params), $shared_secret);
-		}
-		return false;
+ 		if( is_array($query_params) && array_key_exists('shop',$query_params) && array_key_exists('timestamp',$query_params) && array_key_exists('hmac',$query_params)) {
+ 			$hmac = $query_params['hmac'];
+ 			unset($query_params['signature']);
+ 			unset($query_params['hmac']);
+ 			ksort($query_params);
+      $query = http_build_query($query_params);
+      $query = urldecode( $query );
+      $hash_hmac = hash_hmac('sha256', $query, $shared_secret);
+ 			return $hmac == $hash_hmac;
+    }else{
+      return false;
+    }
 	}
 
 
